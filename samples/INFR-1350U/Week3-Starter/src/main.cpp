@@ -64,7 +64,7 @@ bool initGLFW() {
 	}
 
 	//Create a new GLFW window
-	window = glfwCreateWindow(800, 800, "INFR1350U", nullptr, nullptr);
+	window = glfwCreateWindow(800, 800, "Tyler Wong - 100750805", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	// Set our window resized callback

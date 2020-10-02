@@ -190,6 +190,7 @@ int main() {
 	Camera::sptr camera = Camera::Create();
 	camera->SetPosition(glm::vec3(0, 1, -1));
 	camera->LookAt(glm::vec3(0.0f));
+	camera->SetFovDegrees(90.0f);
 
 	// Our high-precision timer
 	double lastFrame = glfwGetTime();

@@ -7,7 +7,6 @@ layout(location = 2) in vec3 inNormal;
 uniform vec3 LightPos;
 out vec4 frag_color;
 
-
 void main() {
 
      // Lecture 5
@@ -29,13 +28,20 @@ void main() {
 
      //Specular
      vec3 camPos = vec3(0.0, 0.0, 3.0);
-     float specStr = 1.0;
-     vec3 camDir = normalize(camPos - inPos);
+     //float specStr = 1.0;
+     //vec3 camDir = normalize(camPos - inPos);
+     //vec3 reflectDir = reflect(-lightDir, norm);
+     //float spec = pow(max(dot(camDir, reflectDir), 0.0), 128);
+     //vec3 specular = specStr * spec * lightColor;
+
+     //Blinn-Phong
+     vec3 viewDir = normalize(camPos - inPos);
      vec3 reflectDir = reflect(-lightDir, norm);
-     float spec = pow(max(dot(camDir, reflectDir), 0.0), 128);
-     vec3 specular = specStr * spec * lightColor;
+     vec3 halfwayDir = normalize(lightDir + viewDir);
+     float spec = pow(max(dot(norm, halfwayDir), 0.0), 128);           
+     vec3 specular = vec3(1.0) * spec * lightColor;
 
      vec3 result = (ambient + diffuse + specular);
 
-    frag_color = vec4(result, 1.0);
+     frag_color = vec4(result, 1.0);
 }

@@ -29,7 +29,6 @@ bool initGLAD() {
 	}
 }
 
-
 GLuint shader_program;
 
 bool loadShaders() {
@@ -79,14 +78,18 @@ bool loadShaders() {
 
 // Lecture 04
 GLfloat rotY = 0.0f;
+GLfloat rotX = 0.0f;
 
 void keyboard() {
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		rotY += 0.1;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		rotY -= 0.1;
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		rotY += 0.1;
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) 
+		rotX -= 0.1;
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) 
+		rotX += 0.1;
 }
-
 
 int main() {
 	//Initialize GLFW
@@ -99,28 +102,47 @@ int main() {
 
 	// Cube data
 	static const GLfloat points[] = {//front face, 2 triangles
-		-0.5f, -0.5f, 0.5f,//0  front face
-		0.5f, -0.5f, 0.5f, //3
-		-0.5f, 0.5f, 0.5f, //1
-		0.5f, -0.5f, 0.5f, //3
-		0.5f, 0.5f, 0.5f, //2
-		-0.5f, 0.5f, 0.5f, //1
-		0.5f, -0.5f, 0.5f, //3 Right face
-		0.5f, -0.5f, -0.5f, //7
-		0.5f, 0.5f, 0.5f, //2
-		0.5f, -0.5f, -0.5f, //7
-		0.5f, 0.5f, -0.5f, //6
-		0.5f, 0.5f, 0.5f,  //2
-		-0.5f, -0.5f, -0.5f, //4 Left face
-		-0.5f, -0.5f, 0.5f, //0
-		-0.5f, 0.5f, -0.5f, //5
-		-0.5f, -0.5f, 0.5f, //0
-		-0.5f, 0.5f, 0.5f,  //1
-		-0.5f, 0.5f, -0.5f, //5
+	   -0.5f, -0.5f,  0.5f,  //0  front face
+		0.5f, -0.5f,  0.5f,  //3
+	   -0.5f,  0.5f,  0.5f,  //1
+		0.5f, -0.5f,  0.5f,  //3
+		0.5f,  0.5f,  0.5f,  //2
+	   -0.5f,  0.5f,  0.5f,  //1
+		0.5f, -0.5f,  0.5f,  //3 Right face
+		0.5f, -0.5f, -0.5f,  //7
+		0.5f,  0.5f,  0.5f,  //2
+		0.5f, -0.5f, -0.5f,  //7
+		0.5f,  0.5f, -0.5f,  //6
+		0.5f,  0.5f,  0.5f,  //2
+	   -0.5f, -0.5f, -0.5f,  //4 Left face
+	   -0.5f, -0.5f,  0.5f,  //0
+	   -0.5f,  0.5f, -0.5f,  //5
+	   -0.5f, -0.5f,  0.5f,  //0
+	   -0.5f,  0.5f,  0.5f,  //1
+	   -0.5f,  0.5f, -0.5f,  //5
+		//Top Face
+	   -0.5f,  0.5f, -0.5f, 
+	   -0.5f,  0.5f,  0.5f, 
+	    0.5f,  0.5f, -0.5f,  
+		0.5f,  0.5f, -0.5f, 
+	   -0.5f,  0.5f,  0.5f,  
+	    0.5f,  0.5f,  0.5f,  
+		//Back Face
+		0.5f, -0.5f, -0.5f,
+	   -0.5f, -0.5f, -0.5f, 
+		0.5f,  0.5f, -0.5f, 
+	   -0.5f, -0.5f, -0.5f, 
+	   -0.5f,  0.5f, -0.5f, 
+		0.5f,  0.5f, -0.5f,
+		//Bottom Face
+	   -0.5f, -0.5f,  0.5f,
+	   -0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f,  0.5f,
+		0.5f, -0.5f,  0.5f,
+	   -0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f, -0.5f,
 	};
 	
-	
-
 	// Color data
 	static const GLfloat colors[] = {
 		0.0f, 0.0f, 1.0f,
@@ -140,7 +162,26 @@ int main() {
 		0.0f, 0.0f, 1.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f
+		1.0f, 0.0f, 0.0f,
+
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 1.0f,
+		0.0f, 1.0f, 1.0f,
+		0.0f, 1.0f, 1.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 1.0f,
+		0.0f, 1.0f, 1.0f,
+		0.0f, 1.0f, 1.0f
 	};
 	
 	//////// LECTURE 05 STARTS HERE
@@ -159,12 +200,33 @@ int main() {
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		// Face 3 (left)
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f
+	   -1.0f, 0.0f, 0.0f,
+	   -1.0f, 0.0f, 0.0f,
+	   -1.0f, 0.0f, 0.0f,
+	   -1.0f, 0.0f, 0.0f,
+	   -1.0f, 0.0f, 0.0f,
+	   -1.0f, 0.0f, 0.0f,
+		// Face 4 (back)
+		0.0f, 0.0f,-1.0f,
+		0.0f, 0.0f,-1.0f,
+		0.0f, 0.0f,-1.0f,
+		0.0f, 0.0f,-1.0f,
+		0.0f, 0.0f,-1.0f,
+		0.0f, 0.0f,-1.0f,
+		// Face 5 (top)
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		// Face 6 (bottom)
+		0.0f,-1.0f, 0.0f,
+		0.0f,-1.0f, 0.0f,
+		0.0f,-1.0f, 0.0f,
+		0.0f,-1.0f, 0.0f,
+		0.0f,-1.0f, 0.0f,
+		0.0f,-1.0f, 0.0f
 	};
 	
 	//Lecture 5
@@ -251,9 +313,7 @@ int main() {
 	// Face culling
 	glEnable(GL_CULL_FACE);
 	// glFrontFace(GL_CW);
-
 	// glCullFace(GL_FRONT); //GL_BACK, GL_FRONT_AND_BACK
-	
 
 	///// Game loop /////
 	while (!glfwWindowShouldClose(window)) {
@@ -267,6 +327,7 @@ int main() {
 		Model = glm::mat4(1.0f);
 		keyboard();												//X	    Y     Z
 		Model = glm::rotate(Model, glm::radians(rotY), glm::vec3(0.0f, 1.0f, 0.0f));
+		Model = glm::rotate(Model, glm::radians(rotX), glm::vec3(1.0f, 0.0f, 0.0f));
 		mvp = Projection * View * Model;
 		
 		//Lecture 04
@@ -283,10 +344,9 @@ int main() {
 		glUniform3fv(LightPosID, 1, &lightPos[0]);
 		/////////////// 5
 		
-		// draw points 0-18 
-		glDrawArrays(GL_TRIANGLES, 0, 18);//36
-		
-		
+		// draw points 0-36
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+				
 		glfwSwapBuffers(window);
 	}
 	return 0;

@@ -36,7 +36,6 @@ void main() {
 
      //Blinn-Phong
      vec3 viewDir = normalize(camPos - inPos);
-     vec3 reflectDir = reflect(-lightDir, norm);
      vec3 halfwayDir = normalize(lightDir + viewDir);
      float spec = pow(max(dot(norm, halfwayDir), 0.0), 128);           
      vec3 specular = vec3(1.0) * spec * lightColor;

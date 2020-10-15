@@ -78,9 +78,17 @@ public:
 	/// </summary>
 	const glm::mat4& GetViewProjection() const;
 
+	bool isOrtho = false;
+	bool GetIsOrtho();
+	void SetIsOrtho(bool ortho);
+
 protected:
 	float _nearPlane;
 	float _farPlane;
+	float _left;
+	float _right;
+	float _bottom;
+	float _top;
 	float _fovRadians;
 	float _aspectRatio;
 

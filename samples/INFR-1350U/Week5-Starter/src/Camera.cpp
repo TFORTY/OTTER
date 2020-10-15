@@ -5,6 +5,10 @@
 Camera::Camera() :
 	_nearPlane(0.1f),
 	_farPlane(1000.0f),
+	_left(-3.0f),
+	_right(3.0f),
+	_bottom(-3.0f),
+	_top(3.0f),
 	_fovRadians(glm::radians(90.0f)),
 	_aspectRatio(1.0f),
 	_position(glm::vec3(0.0f)),
@@ -60,9 +64,29 @@ const glm::mat4& Camera::GetViewProjection() const {
 	return _viewProjection;
 }
 
+bool Camera::GetIsOrtho()
+{
+	return isOrtho;
+}
+
+void Camera::SetIsOrtho(bool ortho)
+{
+	isOrtho = ortho;
+	__CalculateProjection();
+}
+
 void Camera::__CalculateProjection() {
-	_projection = glm::perspective(_fovRadians, _aspectRatio, _nearPlane, _farPlane);
-	_isDirty = true;
+	if (!isOrtho)
+	{
+		_projection = glm::perspective(_fovRadians, _aspectRatio, _nearPlane, _farPlane);
+		_isDirty = true;
+	}
+	else
+	{
+		_projection = glm::ortho(_left, _right, _bottom, _top, _nearPlane, _farPlane);
+		_isDirty = true;
+	}
+
 }
 
 void Camera::__CalculateView() {

@@ -145,13 +145,13 @@ void RenderImGui() {
 	// ImGui context new frame
 	ImGui::NewFrame();
 
-	//if (ImGui::Begin("Debug")) {
-	//	// Render our GUI stuff
-	//	for (auto& func : imGuiCallbacks) {
-	//		func();
-	//	}
-	//	ImGui::End();
-	//}
+	if (ImGui::Begin("Debug")) {
+		// Render our GUI stuff
+		for (auto& func : imGuiCallbacks) {
+			func();
+		}
+		ImGui::End();
+	}
 	
 	// Make sure ImGui knows how big our window is
 	ImGuiIO& io = ImGui::GetIO();
@@ -188,17 +188,17 @@ int main() {
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(GlDebugMessage, nullptr);
 
-	//static const float points[] = {
-	//	-0.5f, -0.5f, 0.1f,
-	//	 0.5f, -0.5f, 0.1f,
-	//	-0.5f,  0.5f, 0.1f
-	//};
-	//
-	//static const float colors[] = {
-	//	1.0f, 0.0f, 0.0f,
-	//	0.0f, 1.0f, 0.0f,
-	//	0.0f, 0.0f, 1.0f
-	//};
+	/*static const float points[] = {
+		-0.5f, -0.5f, 0.1f,
+		 0.5f, -0.5f, 0.1f,
+		-0.5f,  0.5f, 0.1f
+	};
+	
+	static const float colors[] = {
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+	};*/
 
 	//VBO - Vertex buffer object
 	//VertexBuffer::sptr posVbo = VertexBuffer::Create();
@@ -282,7 +282,7 @@ int main() {
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
 	shader->LoadShaderPartFromFile("shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
-	shader->LoadShaderPartFromFile("shaders/basic_shader.glsl", GL_FRAGMENT_SHADER);
+	shader->LoadShaderPartFromFile("shaders/frag_blinn_phong.glsl", GL_FRAGMENT_SHADER);
 	shader->Link();
 	
 	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
@@ -304,36 +304,36 @@ int main() {
 
 	// We'll add some ImGui controls to control our shader
 	imGuiCallbacks.push_back([&]() {
-		//if (ImGui::CollapsingHeader("Scene Level Lighting Settings"))
-		//{
-		//	if (ImGui::ColorPicker3("Ambient Color", glm::value_ptr(ambientCol))) {
-		//		shader->SetUniform("u_AmbientCol", ambientCol);
-		//	}
-		//	if (ImGui::SliderFloat("Fixed Ambient Power", &ambientPow, 0.01f, 1.0f)) {
-		//		shader->SetUniform("u_AmbientStrength", ambientPow); 
-		//	}
-		//}
-		//if (ImGui::CollapsingHeader("Light Level Lighting Settings")) 
-		//{
-		//	if (ImGui::SliderFloat3("Light Pos", glm::value_ptr(lightPos), -10.0f, 10.0f)) {
-		//		shader->SetUniform("u_LightPos", lightPos);
-		//	}
-		//	if (ImGui::ColorPicker3("Light Col", glm::value_ptr(lightCol))) {
-		//		shader->SetUniform("u_LightCol", lightCol);
-		//	}
-		//	if (ImGui::SliderFloat("Light Ambient Power", &lightAmbientPow, 0.0f, 1.0f)) {
-		//		shader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
-		//	}
-		//	if (ImGui::SliderFloat("Light Specular Power", &lightSpecularPow, 0.0f, 1.0f)) {
-		//		shader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
-		//	}
-		//}
-		//if (ImGui::CollapsingHeader("Material Level Lighting Settings"))
-		//{
-		//	if (ImGui::SliderFloat("Shininess", &shininess, 0.1f, 128.0f)) {
-		//		shader->SetUniform("u_Shininess", shininess);
-		//	}
-		//}
+		if (ImGui::CollapsingHeader("Scene Level Lighting Settings"))
+		{
+			if (ImGui::ColorPicker3("Ambient Color", glm::value_ptr(ambientCol))) {
+				shader->SetUniform("u_AmbientCol", ambientCol);
+			}
+			if (ImGui::SliderFloat("Fixed Ambient Power", &ambientPow, 0.01f, 1.0f)) {
+				shader->SetUniform("u_AmbientStrength", ambientPow); 
+			}
+		}
+		if (ImGui::CollapsingHeader("Light Level Lighting Settings")) 
+		{
+			if (ImGui::SliderFloat3("Light Pos", glm::value_ptr(lightPos), -10.0f, 10.0f)) {
+				shader->SetUniform("u_LightPos", lightPos);
+			}
+			if (ImGui::ColorPicker3("Light Col", glm::value_ptr(lightCol))) {
+				shader->SetUniform("u_LightCol", lightCol);
+			}
+			if (ImGui::SliderFloat("Light Ambient Power", &lightAmbientPow, 0.0f, 1.0f)) {
+				shader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
+			}
+			if (ImGui::SliderFloat("Light Specular Power", &lightSpecularPow, 0.0f, 1.0f)) {
+				shader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
+			}
+		}
+		if (ImGui::CollapsingHeader("Material Level Lighting Settings"))
+		{
+			if (ImGui::SliderFloat("Shininess", &shininess, 0.1f, 128.0f)) {
+				shader->SetUniform("u_Shininess", shininess);
+			}
+		}
 	});
 
 	// GL states
@@ -347,9 +347,6 @@ int main() {
 	glm::mat4 transform3 = glm::mat4(1.0f);
 	glm::mat4 transform4 = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
 	transform3 = glm::translate(transform3, glm::vec3(2.0f, 0.0f, 0.0f));
-
-	//glm::mat4 transform2 = glm::mat4(1.0f);
-	//glm::mat4 transform3 = glm::mat4(1.0f);
 
 	camera = Camera::Create();
 	camera->SetPosition(glm::vec3(0, 3, 3)); // Set initial position
@@ -388,23 +385,25 @@ int main() {
 		tKeyWatcher.Poll(window);
 		spaceKeyWatch.Poll(window);
 
-		//if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		//	transform3 = glm::translate(transform3, glm::vec3( 1.0f * dt, 0.0f, 0.0f));
-		//}
-		//if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		//	transform3 = glm::translate(transform3, glm::vec3(-1.0f * dt, 0.0f, 0.0f));
-		//}
-		//if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		//	transform3 = glm::translate(transform3, glm::vec3(0.0f, -1.0f * dt, 0.0f));
-		//}
-		//if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		//	transform3 = glm::translate(transform3, glm::vec3(0.0f,  1.0f * dt, 0.0f));
-		//}
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+			transform = glm::translate(transform, glm::vec3( 1.0f * dt, 0.0f, 0.0f));
+			transform3 = glm::translate(transform3, glm::vec3( 1.0f * dt, 0.0f, 0.0f));
+		}
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+			transform = glm::translate(transform, glm::vec3(-1.0f * dt, 0.0f, 0.0f));
+			transform3 = glm::translate(transform3, glm::vec3(-1.0f * dt, 0.0f, 0.0f));
+		}
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+			transform = glm::translate(transform, glm::vec3(0.0f, -1.0f * dt, 0.0f));
+			transform3 = glm::translate(transform3, glm::vec3(0.0f, -1.0f * dt, 0.0f));
+		}
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+			transform = glm::translate(transform, glm::vec3(0.0f,  1.0f * dt, 0.0f));
+			transform3 = glm::translate(transform3, glm::vec3(0.0f,  1.0f * dt, 0.0f));
+		}
 				
-		//transform = glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
 		transform2 = transform * glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
 		transform4 = transform3 * glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
-		//transform2 = transform * glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.0f, glm::sin(static_cast<float>(thisFrame))));
 		
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

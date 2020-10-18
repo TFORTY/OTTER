@@ -257,18 +257,18 @@ int main() {
 	std::vector< glm::vec2 > uvs;
 	std::vector< glm::vec3 > normals;
 
-	VertexArrayObject::sptr meshVao = nullptr;
 	bool load = ObjLoader::LoadFromFile("Monkey.obj", vertices, uvs, normals);
+	VertexArrayObject::sptr meshVAO = VertexArrayObject::Create();
 
-	meshVao = VertexArrayObject::Create();
 	VertexBuffer::sptr positions = VertexBuffer::Create();
 	positions->LoadData(vertices.data(), vertices.size());
+
 	VertexBuffer::sptr UVs = VertexBuffer::Create();
 	UVs->LoadData(uvs.data(), uvs.size());
+
 	VertexBuffer::sptr norms = VertexBuffer::Create();
 	norms->LoadData(normals.data(), normals.size());
 
-	VertexArrayObject::sptr meshVAO = VertexArrayObject::Create();
 	meshVAO->AddVertexBuffer(positions, {
 		BufferAttribute(0, 3, GL_FLOAT, false, 0, NULL)
 		});

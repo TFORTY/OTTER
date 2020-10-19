@@ -265,7 +265,7 @@ int main() {
 
 	VertexBuffer::sptr UVs = VertexBuffer::Create();
 	UVs->LoadData(uvs.data(), uvs.size());
-
+	
 	VertexBuffer::sptr norms = VertexBuffer::Create();
 	norms->LoadData(normals.data(), normals.size());
 
@@ -278,6 +278,12 @@ int main() {
 	meshVAO->AddVertexBuffer(norms, {
 		BufferAttribute(2, 3, GL_FLOAT, false, 0, NULL)
 		});
+
+	ObjLoader monkey("Monkey.obj");
+	VertexArrayObject::sptr monkeyMesh = monkey.loadObj();
+
+	ObjLoader box("invalid.obj");
+	VertexArrayObject::sptr boxMesh = box.loadObj();
 
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
@@ -348,6 +354,10 @@ int main() {
 	glm::mat4 transform4 = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
 	transform3 = glm::translate(transform3, glm::vec3(2.0f, 0.0f, 0.0f));
 
+	glm::mat4 monkeyTransform = glm::mat4(1.0f);
+
+	glm::mat4 boxTransform = glm::mat4(1.0f);
+
 	camera = Camera::Create();
 	camera->SetPosition(glm::vec3(0, 3, 3)); // Set initial position
 	camera->SetUp(glm::vec3(0, 0, 1)); // Use a z-up coordinate system
@@ -404,7 +414,10 @@ int main() {
 				
 		transform2 = transform * glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
 		transform4 = transform3 * glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
-		
+		monkeyTransform = glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
+		boxTransform = glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
+		boxTransform = glm::translate(boxTransform, glm::vec3(0.0f, 2.0f, 0.0f));
+
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -417,11 +430,21 @@ int main() {
 		shader->SetUniformMatrix("u_Model", transform2);
 		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform2));
 		meshVAO->Render();
-
+		
 		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* transform4);
 		shader->SetUniformMatrix("u_Model", transform4);
 		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform4));
 		meshVAO->Render();
+
+		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* monkeyTransform);
+		shader->SetUniformMatrix("u_Model", monkeyTransform);
+		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(monkeyTransform));
+		monkeyMesh->Render();
+
+		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* boxTransform);
+		shader->SetUniformMatrix("u_Model", boxTransform);
+		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(boxTransform));
+		boxMesh->Render();
 
 		// These uniforms update for every object we want to draw
 		//shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection() * transform);

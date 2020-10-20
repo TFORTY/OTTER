@@ -7,6 +7,29 @@
 #include <GLM/glm.hpp> //04
 #include <glm/gtc/matrix_transform.hpp> //04
 
+//LECTURE 7
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+unsigned char* image;
+int width, height;
+
+void loadImage(const char* fileName)
+{
+	int channels;
+	stbi_set_flip_vertically_on_load(true);
+	image = stbi_load(fileName, &width, &height, &channels, 0);
+
+	if (image)
+	{
+		std::cout << "Image loaded: " << width << " x " << height << std::endl;
+	}
+	else
+	{
+		std::cout << "Failed to load image" << std::endl;
+	}
+}
+
 GLFWwindow* window;
 
 bool initGLFW() {
@@ -14,11 +37,11 @@ bool initGLFW() {
 		std::cout << "Failed to Initialize GLFW" << std::endl;
 		return false;
 	}
-	
+
 	//Create a new GLFW window
 	window = glfwCreateWindow(1000, 800, "INFR2670", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
-	
+
 	return true;
 }
 
@@ -28,6 +51,7 @@ bool initGLAD() {
 		return false;
 	}
 }
+
 
 GLuint shader_program;
 
@@ -67,7 +91,7 @@ bool loadShaders() {
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fs, 1, &fs_str, NULL);
 	glCompileShader(fs);
-	
+
 	shader_program = glCreateProgram();
 	glAttachShader(shader_program, fs);
 	glAttachShader(shader_program, vs);
@@ -79,16 +103,21 @@ bool loadShaders() {
 // Lecture 04
 GLfloat rotY = 0.0f;
 GLfloat rotX = 0.0f;
+GLfloat transZ = 0.0f;
 
 void keyboard() {
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		rotY -= 0.1;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		rotY += 0.1;
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) 
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		rotY -= 0.1;
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		rotX -= 0.1;
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) 
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		rotX += 0.1;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		transZ -= 0.001;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		transZ += 0.001;
 }
 
 int main() {
@@ -99,50 +128,50 @@ int main() {
 	//Initialize GLAD
 	if (!initGLAD())
 		return 1;
-
+	
 	// Cube data
 	static const GLfloat points[] = {//front face, 2 triangles
-	   -0.5f, -0.5f,  0.5f,  //0  front face
-		0.5f, -0.5f,  0.5f,  //3
-	   -0.5f,  0.5f,  0.5f,  //1
-		0.5f, -0.5f,  0.5f,  //3
-		0.5f,  0.5f,  0.5f,  //2
-	   -0.5f,  0.5f,  0.5f,  //1
-		0.5f, -0.5f,  0.5f,  //3 Right face
-		0.5f, -0.5f, -0.5f,  //7
-		0.5f,  0.5f,  0.5f,  //2
-		0.5f, -0.5f, -0.5f,  //7
-		0.5f,  0.5f, -0.5f,  //6
-		0.5f,  0.5f,  0.5f,  //2
-	   -0.5f, -0.5f, -0.5f,  //4 Left face
-	   -0.5f, -0.5f,  0.5f,  //0
-	   -0.5f,  0.5f, -0.5f,  //5
-	   -0.5f, -0.5f,  0.5f,  //0
-	   -0.5f,  0.5f,  0.5f,  //1
-	   -0.5f,  0.5f, -0.5f,  //5
-		//Top Face
-	   -0.5f,  0.5f, -0.5f, 
-	   -0.5f,  0.5f,  0.5f, 
-	    0.5f,  0.5f, -0.5f,  
-		0.5f,  0.5f, -0.5f, 
-	   -0.5f,  0.5f,  0.5f,  
-	    0.5f,  0.5f,  0.5f,  
+		-0.5f, -0.5f, 0.5f,//0  front face
+		0.5f, -0.5f, 0.5f, //3
+		-0.5f, 0.5f, 0.5f, //1
+		0.5f, -0.5f, 0.5f, //3
+		0.5f, 0.5f, 0.5f, //2
+		-0.5f, 0.5f, 0.5f, //1
+		0.5f, -0.5f, 0.5f, //3 Right face
+		0.5f, -0.5f, -0.5f, //7
+		0.5f, 0.5f, 0.5f, //2
+		0.5f, -0.5f, -0.5f, //7
+		0.5f, 0.5f, -0.5f, //6
+		0.5f, 0.5f, 0.5f,  //2
+		-0.5f, -0.5f, -0.5f, //4 Left face
+		-0.5f, -0.5f, 0.5f, //0
+		-0.5f, 0.5f, -0.5f, //5
+		-0.5f, -0.5f, 0.5f, //0
+		-0.5f, 0.5f, 0.5f,  //1
+		-0.5f, 0.5f, -0.5f, //5		
 		//Back Face
-		0.5f, -0.5f, -0.5f,
-	   -0.5f, -0.5f, -0.5f, 
-		0.5f,  0.5f, -0.5f, 
-	   -0.5f, -0.5f, -0.5f, 
-	   -0.5f,  0.5f, -0.5f, 
-		0.5f,  0.5f, -0.5f,
-		//Bottom Face
-	   -0.5f, -0.5f,  0.5f,
-	   -0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f,  0.5f,
-		0.5f, -0.5f,  0.5f,
-	   -0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f
+		 0.5f, -0.5f, -0.5f,
+	    -0.5f, -0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+	    -0.5f, -0.5f, -0.5f,
+	    -0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 //Top Face
+		-0.5f,  0.5f, -0.5f,
+		-0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+	    -0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 //Bottom Face
+	    -0.5f, -0.5f,  0.5f,
+	    -0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+	    -0.5f, -0.5f, -0.5f,
+	 	 0.5f, -0.5f, -0.5f
 	};
-	
+
 	// Color data
 	static const GLfloat colors[] = {
 		0.0f, 0.0f, 1.0f,
@@ -163,25 +192,24 @@ int main() {
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
-
 		0.0f, 0.0f, 1.0f,
 		0.0f, 0.0f, 1.0f,
 		0.0f, 0.0f, 1.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f
 	};
 	
 	//////// LECTURE 05 STARTS HERE
@@ -200,12 +228,12 @@ int main() {
 		1.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,
 		// Face 3 (left)
-	   -1.0f, 0.0f, 0.0f,
-	   -1.0f, 0.0f, 0.0f,
-	   -1.0f, 0.0f, 0.0f,
-	   -1.0f, 0.0f, 0.0f,
-	   -1.0f, 0.0f, 0.0f,
-	   -1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
+		-1.0f, 0.0f, 0.0f,
 		// Face 4 (back)
 		0.0f, 0.0f,-1.0f,
 		0.0f, 0.0f,-1.0f,
@@ -228,11 +256,56 @@ int main() {
 		0.0f,-1.0f, 0.0f,
 		0.0f,-1.0f, 0.0f
 	};
+
+	//LECTURE 7
+	static const GLfloat uv[] = {
+		0.0f, 0.0f, 
+		1.0f, 0.0f, 
+		0.0f, 1.0f, 
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+		0.0f, 1.0f
+	};
 	
-	//Lecture 5
+	// Lecture 5
 	GLfloat cameraPos[] = { 0.0f, 0.0f, 3.0f };
 	GLfloat lightPos[] = { 0.0f, 0.0f, 3.0f };
-	
+		
 	//VBO
 	GLuint pos_vbo = 0;
 	glGenBuffers(1, &pos_vbo);
@@ -243,12 +316,12 @@ int main() {
 	glGenBuffers(1, &color_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-
+	
 	GLuint normal_vbo = 2;
 	glGenBuffers(1, &normal_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, normal_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, pos_vbo);
 
 	//			(index, size, type, normalized, stride, pointer)
@@ -259,14 +332,85 @@ int main() {
 	
 	glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-	//Lecture 5
+	
+	// Lecture 5
 	glBindBuffer(GL_ARRAY_BUFFER, normal_vbo);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
+	
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2); //Lecture 5
+	glEnableVertexAttribArray(2); // Lecture 5
+
+	//LECTURE 7
+	GLuint uv_vbo = 3;
+	glGenBuffers(1, &uv_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, uv_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uv), uv, GL_STATIC_DRAW);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(3);
+
+	loadImage("box.bmp");
+	GLuint textureHandle;
+	glGenTextures(1, &textureHandle);
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	//Texture Parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST for 8-bit look, GL_LINEAR for more realism
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
+	stbi_image_free(image);
+
+	loadImage("checker.jpg");
+	GLuint textureHandle2;
+	glGenTextures(1, &textureHandle2);
+	glBindTexture(GL_TEXTURE_2D, textureHandle2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	//Texture Parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST for 8-bit look, GL_LINEAR for more realism
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(image);
+
+	loadImage("stone.jpg");
+	GLuint textureHandle3;
+	glGenTextures(1, &textureHandle3);
+	glBindTexture(GL_TEXTURE_2D, textureHandle3);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	//Texture Parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST for 8-bit look, GL_LINEAR for more realism
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(image);
+
+	loadImage("synthesis.jpg");
+	GLuint textureHandle4;
+	glGenTextures(1, &textureHandle4);
+	glBindTexture(GL_TEXTURE_2D, textureHandle4);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	//Texture Parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST for 8-bit look, GL_LINEAR for more realism
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(image);
+
+	loadImage("blue.jpg");
+	GLuint textureHandle5;
+	glGenTextures(1, &textureHandle5);
+	glBindTexture(GL_TEXTURE_2D, textureHandle5);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	//Texture Parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST for 8-bit look, GL_LINEAR for more realism
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(image);
+
+	loadImage("grass.jpg");
+	GLuint textureHandle6;
+	glGenTextures(1, &textureHandle6);
+	glBindTexture(GL_TEXTURE_2D, textureHandle6);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	//Texture Parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST for 8-bit look, GL_LINEAR for more realism
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	stbi_image_free(image);
+
+	////////////////////////////////// 07
 
 	// Load your shaders
 	if (!loadShaders())
@@ -279,7 +423,7 @@ int main() {
 	glm::mat4 Projection = 
 		glm::perspective(glm::radians(45.0f), 
 		(float)width / (float)height, 0.1f, 100.0f);
-	
+
 	// Camera matrix
 	glm::mat4 View = glm::lookAt(
 		glm::vec3(0, 0, 3), // Camera is at (0,0,3), in World Space
@@ -297,8 +441,8 @@ int main() {
 	// Only during the initialisation
 	GLuint MatrixID = 
 		glGetUniformLocation(shader_program, "MVP");
-	
-	//Lecture 5
+
+	// Lecture 05
 	GLuint ViewID =
 		glGetUniformLocation(shader_program, "View");
 	GLuint ModelID =
@@ -306,14 +450,16 @@ int main() {
 	GLuint LightPosID =
 		glGetUniformLocation(shader_program, "LightPos");
 
-	//////////////////
+	/////////////////
 	
 	glEnable(GL_DEPTH_TEST);
 
 	// Face culling
 	glEnable(GL_CULL_FACE);
 	// glFrontFace(GL_CW);
+
 	// glCullFace(GL_FRONT); //GL_BACK, GL_FRONT_AND_BACK
+	
 
 	///// Game loop /////
 	while (!glfwWindowShouldClose(window)) {
@@ -328,6 +474,7 @@ int main() {
 		keyboard();												//X	    Y     Z
 		Model = glm::rotate(Model, glm::radians(rotY), glm::vec3(0.0f, 1.0f, 0.0f));
 		Model = glm::rotate(Model, glm::radians(rotX), glm::vec3(1.0f, 0.0f, 0.0f));
+		Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, transZ));
 		mvp = Projection * View * Model;
 		
 		//Lecture 04
@@ -336,19 +483,29 @@ int main() {
 		glUniformMatrix4fv(MatrixID, 1, 
 			GL_FALSE, &mvp[0][0]);
 		
-		//Lecture 5
+		// Lecture 5
 		glUniformMatrix4fv(ViewID, 1,
 			GL_FALSE, &View[0][0]);
 		glUniformMatrix4fv(ModelID, 1,
 			GL_FALSE, &Model[0][0]);
 		glUniform3fv(LightPosID, 1, &lightPos[0]);
 		/////////////// 5
-		
-		// draw points 0-36
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-				
+	
+		//Draw points
+		glBindTexture(GL_TEXTURE_2D, textureHandle);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindTexture(GL_TEXTURE_2D, textureHandle2);
+		glDrawArrays(GL_TRIANGLES, 6, 6);
+		glBindTexture(GL_TEXTURE_2D, textureHandle3);
+		glDrawArrays(GL_TRIANGLES, 12, 6);
+		glBindTexture(GL_TEXTURE_2D, textureHandle4);
+		glDrawArrays(GL_TRIANGLES, 18, 6);
+		glBindTexture(GL_TEXTURE_2D, textureHandle5);
+		glDrawArrays(GL_TRIANGLES, 24, 6);
+		glBindTexture(GL_TEXTURE_2D, textureHandle6);
+		glDrawArrays(GL_TRIANGLES, 30, 6);
+
 		glfwSwapBuffers(window);
 	}
 	return 0;
-	
 }

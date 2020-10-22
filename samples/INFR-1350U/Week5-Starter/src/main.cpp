@@ -280,10 +280,10 @@ int main() {
 		});
 
 	ObjLoader monkey("Monkey.obj");
-	VertexArrayObject::sptr monkeyMesh = monkey.loadObj();
+	//VertexArrayObject::sptr monkeyMesh = monkey.loadObj();
 
 	ObjLoader box("invalid.obj");
-	VertexArrayObject::sptr boxMesh = box.loadObj();
+	//VertexArrayObject::sptr boxMesh = box.loadObj();
 
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
@@ -435,16 +435,19 @@ int main() {
 		shader->SetUniformMatrix("u_Model", transform4);
 		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform4));
 		meshVAO->Render();
+		
 
 		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* monkeyTransform);
 		shader->SetUniformMatrix("u_Model", monkeyTransform);
 		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(monkeyTransform));
-		monkeyMesh->Render();
+		//monkeyMesh->Render();
+		monkey.Render();
 
 		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* boxTransform);
 		shader->SetUniformMatrix("u_Model", boxTransform);
 		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(boxTransform));
-		boxMesh->Render();
+		//boxMesh->Render();
+		box.Render();
 
 		// These uniforms update for every object we want to draw
 		//shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection() * transform);

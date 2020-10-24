@@ -252,47 +252,16 @@ int main() {
 	// load an exact copy of the mesh created above
 	//VertexArrayObject::sptr vao4 = NotObjLoader::LoadFromFile("Sample.notobj");
 
-	//Load in the .obj file
-	std::vector< glm::vec3 > vertices;
-	std::vector< glm::vec2 > uvs;
-	std::vector< glm::vec3 > normals;
-
-	bool load = ObjLoader::LoadFromFile("Monkey.obj", vertices, uvs, normals);
-	VertexArrayObject::sptr meshVAO = VertexArrayObject::Create();
-
-	VertexBuffer::sptr positions = VertexBuffer::Create();
-	positions->LoadData(vertices.data(), vertices.size());
-
-	VertexBuffer::sptr UVs = VertexBuffer::Create();
-	UVs->LoadData(uvs.data(), uvs.size());
-	
-	VertexBuffer::sptr norms = VertexBuffer::Create();
-	norms->LoadData(normals.data(), normals.size());
-
-	meshVAO->AddVertexBuffer(positions, {
-		BufferAttribute(0, 3, GL_FLOAT, false, 0, NULL)
-		});
-	meshVAO->AddVertexBuffer(UVs, {
-		BufferAttribute(1, 2, GL_FLOAT, false, 0, NULL)
-		});
-	meshVAO->AddVertexBuffer(norms, {
-		BufferAttribute(2, 3, GL_FLOAT, false, 0, NULL)
-		});
-
-	ObjLoader monkey("Monkey.obj");
-	//VertexArrayObject::sptr monkeyMesh = monkey.loadObj();
-
-	ObjLoader box("invalid.obj");
-	//VertexArrayObject::sptr boxMesh = box.loadObj();
+	ObjLoader test("monkey.obj");
 
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
 	shader->LoadShaderPartFromFile("shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
-	shader->LoadShaderPartFromFile("shaders/frag_blinn_phong.glsl", GL_FRAGMENT_SHADER);
+	shader->LoadShaderPartFromFile("shaders/frag_shader.glsl", GL_FRAGMENT_SHADER);
 	shader->Link();
 	
 	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
-	glm::vec3 lightCol = glm::vec3(0.3f, 0.2f, 0.5f);
+	glm::vec3 lightCol = glm::vec3(1.f, 1.f, 1.f);
 	float     lightAmbientPow = 0.05f;
 	float     lightSpecularPow = 1.0f;
 	glm::vec3 ambientCol = glm::vec3(1.0f);
@@ -347,20 +316,11 @@ int main() {
 	//glEnable(GL_CULL_FACE);
 
 	glm::mat4 transform = glm::mat4(1.0f);
-	glm::mat4 transform2 = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 0.0f, 0.0f));
-	transform = glm::translate(transform, glm::vec3(-2.0f, 0.0f, 0.0f));
-
-	glm::mat4 transform3 = glm::mat4(1.0f);
-	glm::mat4 transform4 = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
-	transform3 = glm::translate(transform3, glm::vec3(2.0f, 0.0f, 0.0f));
-
-	glm::mat4 monkeyTransform = glm::mat4(1.0f);
-
-	glm::mat4 boxTransform = glm::mat4(1.0f);
+	glm::mat4 transform2 = glm::mat4(1.0f);
 
 	camera = Camera::Create();
 	camera->SetPosition(glm::vec3(0, 3, 3)); // Set initial position
-	camera->SetUp(glm::vec3(0, 0, 1)); // Use a z-up coordinate system
+	camera->SetUp(glm::vec3(0, 0, -1)); // Use a z-up coordinate system
 	camera->LookAt(glm::vec3(0.0f)); // Look at center of the screen
 	camera->SetFovDegrees(90.0f); // Set an initial FOV
 	
@@ -396,64 +356,34 @@ int main() {
 		spaceKeyWatch.Poll(window);
 
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-			transform = glm::translate(transform, glm::vec3( 1.0f * dt, 0.0f, 0.0f));
-			transform3 = glm::translate(transform3, glm::vec3( 1.0f * dt, 0.0f, 0.0f));
+			transform = glm::translate(transform, glm::vec3(-1.0f * dt, 0.0f, 0.0f));
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-			transform = glm::translate(transform, glm::vec3(-1.0f * dt, 0.0f, 0.0f));
-			transform3 = glm::translate(transform3, glm::vec3(-1.0f * dt, 0.0f, 0.0f));
+			transform = glm::translate(transform, glm::vec3(1.0f * dt, 0.0f, 0.0f));
 		}
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			transform = glm::translate(transform, glm::vec3(0.0f, -1.0f * dt, 0.0f));
-			transform3 = glm::translate(transform3, glm::vec3(0.0f, -1.0f * dt, 0.0f));
+			transform = glm::translate(transform, glm::vec3(0.0f, 1.0f * dt, 0.0f));
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-			transform = glm::translate(transform, glm::vec3(0.0f,  1.0f * dt, 0.0f));
-			transform3 = glm::translate(transform3, glm::vec3(0.0f,  1.0f * dt, 0.0f));
+			transform = glm::translate(transform, glm::vec3(0.0f,  -1.0f * dt, 0.0f));
 		}
-				
-		transform2 = transform * glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
-		transform4 = transform3 * glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
-		monkeyTransform = glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
-		boxTransform = glm::rotate(glm::mat4(1.0f), static_cast<float>(thisFrame), glm::vec3(0, 1, 0));
-		boxTransform = glm::translate(boxTransform, glm::vec3(0.0f, 2.0f, 0.0f));
+
+		transform2 = transform * glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.0f, glm::sin(static_cast<float>(thisFrame))));
 
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader->Bind();
+		shader->SetUniform("u_CamPos", camera->GetPosition());
+		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* transform);
+		shader->SetUniformMatrix("u_Model", transform);
+		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform));
+		 
+		test.Render();
+
 		// These are the uniforms that update only once per frame
 		//shader->SetUniformMatrix("u_View", camera->GetView());
 		//shader->SetUniform("u_CamPos", camera->GetPosition());
-
-		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection() * transform2);
-		shader->SetUniformMatrix("u_Model", transform2);
-		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform2));
-		meshVAO->Render();
-		
-		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* transform4);
-		shader->SetUniformMatrix("u_Model", transform4);
-		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform4));
-		meshVAO->Render();
-		
-
-		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* monkeyTransform);
-		shader->SetUniformMatrix("u_Model", monkeyTransform);
-		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(monkeyTransform));
-		//monkeyMesh->Render();
-		monkey.Render();
-
-		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* boxTransform);
-		shader->SetUniformMatrix("u_Model", boxTransform);
-		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(boxTransform));
-		//boxMesh->Render();
-		box.Render();
-
-		// These uniforms update for every object we want to draw
-		//shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection() * transform);
-		//shader->SetUniformMatrix("u_Model", transform);
-		//shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform));
-		//vao->Render();
 
 		//shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* transform2);
 		//shader->SetUniformMatrix("u_Model", transform2);

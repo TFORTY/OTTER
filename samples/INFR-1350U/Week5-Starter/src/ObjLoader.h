@@ -7,7 +7,7 @@
 class ObjLoader
 {
 public:
-    ObjLoader(const std::string& f);
+    ObjLoader(const std::string& f, const glm::vec4& inColor = glm::vec4(1.f));
     VertexArrayObject::sptr makeVAO();
 
     /////////////////////////////////////////////////////////

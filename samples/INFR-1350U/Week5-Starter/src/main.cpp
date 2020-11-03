@@ -252,7 +252,7 @@ int main() {
 	// load an exact copy of the mesh created above
 	//VertexArrayObject::sptr vao4 = NotObjLoader::LoadFromFile("Sample.notobj");
 
-	ObjLoader test("monkey.obj");
+	ObjLoader test("monkey.obj", glm::vec4(0.f, 1.f, 0.f, 1.f));
 
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();

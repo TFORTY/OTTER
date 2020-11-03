@@ -25,7 +25,7 @@ static inline void trim(std::string& s) {
     rtrim(s);
 }
 
-ObjLoader::ObjLoader(const std::string& f)
+ObjLoader::ObjLoader(const std::string& f, const glm::vec4& inColor)
 {
     std::ifstream file;
     file.open(f, std::ios::binary);
@@ -103,9 +103,10 @@ ObjLoader::ObjLoader(const std::string& f)
         Interleaved.push_back(temp_vertices[vertexIndex - 1].x);
         Interleaved.push_back(temp_vertices[vertexIndex - 1].y);
         Interleaved.push_back(temp_vertices[vertexIndex - 1].z);
-        Interleaved.push_back(1.0f);
-        Interleaved.push_back(1.0f);
-        Interleaved.push_back(1.0f);
+        Interleaved.push_back(inColor.x);
+        Interleaved.push_back(inColor.y);
+        Interleaved.push_back(inColor.z);
+        Interleaved.push_back(inColor.w);
         Interleaved.push_back(temp_uvs[uvIndex - 1].x);
         Interleaved.push_back(temp_uvs[uvIndex - 1].y);
         Interleaved.push_back(temp_normals[normIndex - 1].x);
@@ -123,7 +124,7 @@ VertexArrayObject::sptr ObjLoader::makeVAO()
     VertexBuffer::sptr vbo = VertexBuffer::Create();
     vbo->LoadData(Interleaved.data(), Interleaved.size());
 
-    size_t stride = sizeof(float) * 11;
+    size_t stride = sizeof(float) * 12;//11
 
     vao->AddVertexBuffer(vbo, {
     BufferAttribute(0, 3, GL_FLOAT, false, stride, NULL),

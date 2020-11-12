@@ -29,6 +29,11 @@ uniform vec3  u_CamPos;
 
 out vec4 frag_color;
 
+//Reflection Stuff
+uniform samplerCube s_Environment;
+uniform mat3 u_EnvironmentRotation;
+uniform sampler2D s_Reflect;
+
 // https://learnopengl.com/Advanced-Lighting/Advanced-Lighting
 void main() {
 	// Lecture 5
@@ -52,6 +57,12 @@ void main() {
 	vec3 viewDir  = normalize(u_CamPos - inPos);
 	vec3 h        = normalize(lightDir + viewDir);
 
+	//Reflection Stuff
+	vec3 toEye = normalize(inPos - u_CamPos);
+	vec3 reflected = reflect(toEye, N);
+	vec3 environment = texture(s_Environment, u_EnvironmentRotation * reflected).rgb;
+	vec4 reflection = texture(s_Reflect, inUV);
+
 	// Get the specular power from the specular map
 	float texSpec = texture(s_Specular, inUV).x;
 	float spec = pow(max(dot(N, h), 0.0), u_Shininess); // Shininess coefficient (can be a uniform)
@@ -60,6 +71,7 @@ void main() {
 	// Get the albedo from the diffuse / albedo map
 	vec4 textureColor1 = texture(s_Diffuse, inUV);
 	vec4 textureColor2 = texture(s_Diffuse2, inUV);
+	float reflectColor = texture(s_Reflect, inUV).x;
 	vec4 textureColor = mix(textureColor1, textureColor2, u_TextureMix);
 
 	vec3 result = (
@@ -67,5 +79,6 @@ void main() {
 		(ambient + diffuse + specular) * attenuation // light factors from our single light
 		) * inColor * textureColor.rgb; // Object color
 
+	result = mix(result, environment.rgb, reflectColor);
 	frag_color = vec4(result, textureColor.a);
 }

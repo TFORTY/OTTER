@@ -96,7 +96,7 @@ bool initGLFW() {
 #endif
 	
 	//Create a new GLFW window
-	window = glfwCreateWindow(800, 800, "INFR1350U", nullptr, nullptr);
+	window = glfwCreateWindow(800, 800, "100750805", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	// Set our window resized callback
@@ -333,10 +333,12 @@ int main() {
 		Texture2D::sptr diffuse = Texture2D::LoadFromFile("images/Stone_001_Diffuse.png");
 		Texture2D::sptr diffuse2 = Texture2D::LoadFromFile("images/box.bmp");
 		Texture2D::sptr specular = Texture2D::LoadFromFile("images/Stone_001_Specular.png"); 
+		
+		Texture2D::sptr reflect = Texture2D::LoadFromFile("images/box-reflections.bmp");
 
 		// Load the cube map
-		TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("images/cubemaps/skybox/sample.jpg");
-		//TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("images/cubemaps/skybox/ocean.jpg"); 
+		//TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("images/cubemaps/skybox/sample.jpg");
+		TextureCubeMap::sptr environmentMap = TextureCubeMap::LoadFromImages("images/cubemaps/skybox/ocean.jpg"); 
 
 		// Creating an empty texture
 		Texture2DDescription desc = Texture2DDescription();
@@ -345,17 +347,17 @@ int main() {
 		desc.Format = InternalFormat::RGB8;
 		Texture2D::sptr texture2 = Texture2D::Create(desc);
 		// Clear it with a white colour
-		texture2->Clear();
+		texture2->Clear(); 
 
 		#pragma endregion
 
 		///////////////////////////////////// Scene Generation //////////////////////////////////////////////////
 		#pragma region Scene Generation
-		
+		 
 		// We need to tell our scene system what extra component types we want to support
 		GameScene::RegisterComponentType<RendererComponent>();
 		GameScene::RegisterComponentType<BehaviourBinding>();
-		GameScene::RegisterComponentType<Camera>();
+		GameScene::RegisterComponentType<Camera>(); 
 
 		// Create a scene, and set it to be the active scene in the application
 		GameScene::sptr scene = GameScene::Create("test");
@@ -365,24 +367,28 @@ int main() {
 		auto renderGroup = scene->Registry().group<RendererComponent, Transform>();
 
 		// Create a material and set some properties for it
-		ShaderMaterial::sptr material0 = ShaderMaterial::Create();  
-		material0->Shader = shader;
-		material0->Set("s_Diffuse", diffuse);
-		material0->Set("s_Diffuse2", diffuse2);
-		material0->Set("s_Specular", specular);
-		material0->Set("u_Shininess", 8.0f);
+		ShaderMaterial::sptr material0 = ShaderMaterial::Create();    
+		material0->Shader = shader;   
+		material0->Set("s_Diffuse", diffuse); 
+		material0->Set("s_Diffuse2", diffuse2);   
+		material0->Set("s_Specular", specular); 
+		material0->Set("u_Shininess", 8.0f);  
 		material0->Set("u_TextureMix", 0.5f); 
+		material0->Set("s_Reflect", reflect);
+		material0->Set("s_Environment", environmentMap);
+		material0->Set("u_EnvironmentRotation", glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0))));
 
 		// Load a second material for our reflective material!
 		Shader::sptr reflectiveShader = Shader::Create();
 		reflectiveShader->LoadShaderPartFromFile("shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
 		reflectiveShader->LoadShaderPartFromFile("shaders/frag_reflection.frag.glsl", GL_FRAGMENT_SHADER);
 		reflectiveShader->Link();
-		
-		ShaderMaterial::sptr reflectiveMat = ShaderMaterial::Create();
+
+		ShaderMaterial::sptr reflectiveMat = ShaderMaterial::Create(); 
 		reflectiveMat->Shader = reflectiveShader;
 		reflectiveMat->Set("s_Environment", environmentMap);
 		// TODO: send the rotation to apply to the skybox
+		reflectiveMat->Set("u_EnvironmentRotation", glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0))));
 
 		GameObject sceneObj = scene->CreateEntity("scene_geo");
 		{
@@ -397,8 +403,8 @@ int main() {
 			obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(material0);
 			obj2.get<Transform>().SetLocalPosition(0.0f, 0.0f, 1.0f);
 			BehaviourBinding::BindDisabled<SimpleMoveBehaviour>(obj2);
-		}
-
+		} 
+		 
 		GameObject obj3 = scene->CreateEntity("monkey_tris");
 		{
 			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/monkey.obj");
@@ -406,7 +412,6 @@ int main() {
 			obj3.get<Transform>().SetLocalPosition(2.0f, 0.0f, 1.0f);
 			BehaviourBinding::BindDisabled<SimpleMoveBehaviour>(obj3);
 		}
-
 
 		GameObject obj5 = scene->CreateEntity("cube");
 		{
@@ -464,11 +469,12 @@ int main() {
 			skybox->LoadShaderPartFromFile("shaders/skybox-shader.vert.glsl", GL_VERTEX_SHADER);
 			skybox->LoadShaderPartFromFile("shaders/skybox-shader.frag.glsl", GL_FRAGMENT_SHADER);
 			skybox->Link();
-
+			 
 			ShaderMaterial::sptr skyboxMat = ShaderMaterial::Create();
 			skyboxMat->Shader = skybox;  
 			skyboxMat->Set("s_Environment", environmentMap);
 			// TODO: send the rotation to apply to the skybox
+			skyboxMat->Set("u_EnvironmentRotation", glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1, 0, 0)))); 
 			skyboxMat->RenderLayer = 100;
 
 			MeshBuilder<VertexPosNormTexCol> mesh;
@@ -584,7 +590,7 @@ int main() {
 				if (l.Material < r.Material) return true;
 				if (l.Material > r.Material) return false;
 				
-				return false;
+				return false; 
 			});
 
 			// Start by assuming no shader or material is applied

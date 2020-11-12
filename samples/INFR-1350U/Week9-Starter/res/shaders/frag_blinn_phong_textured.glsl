@@ -61,7 +61,6 @@ void main() {
 	vec3 toEye = normalize(inPos - u_CamPos);
 	vec3 reflected = reflect(toEye, N);
 	vec3 environment = texture(s_Environment, u_EnvironmentRotation * reflected).rgb;
-	vec4 reflection = texture(s_Reflect, inUV);
 
 	// Get the specular power from the specular map
 	float texSpec = texture(s_Specular, inUV).x;

@@ -245,7 +245,7 @@ int main() {
 		Shader::sptr shader = Shader::Create();
 		shader->LoadShaderPartFromFile("shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
 		shader->LoadShaderPartFromFile("shaders/frag_blinn_phong_textured.glsl", GL_FRAGMENT_SHADER);
-		shader->Link();
+		shader->Link(); 
 
 		glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
 		glm::vec3 lightCol = glm::vec3(0.9f, 0.85f, 0.5f);

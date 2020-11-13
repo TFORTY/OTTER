@@ -31,9 +31,9 @@ void loadImage() {
 	}
 
 }
+ 
 
-
-
+ 
 bool initGLFW() {
 	if (glfwInit() == GLFW_FALSE) {
 		std::cout << "Failed to Initialize GLFW" << std::endl;

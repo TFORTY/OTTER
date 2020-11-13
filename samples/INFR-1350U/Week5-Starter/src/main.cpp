@@ -4,9 +4,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <filesystem>
+#include <filesystem>      
 #include <json.hpp>
 #include <fstream>
+#include <string>
 
 #include <GLM/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
@@ -145,13 +146,13 @@ void RenderImGui() {
 	// ImGui context new frame
 	ImGui::NewFrame();
 
-	if (ImGui::Begin("Debug")) {
-		// Render our GUI stuff
-		for (auto& func : imGuiCallbacks) {
-			func();
-		}
-		ImGui::End();
-	}
+	//if (ImGui::Begin("Debug")) {
+	//	// Render our GUI stuff
+	//	for (auto& func : imGuiCallbacks) {
+	//		func();
+	//	}
+	//	ImGui::End();
+	//}
 	
 	// Make sure ImGui knows how big our window is
 	ImGuiIO& io = ImGui::GetIO();
@@ -171,6 +172,33 @@ void RenderImGui() {
 		// Restore our gl context
 		glfwMakeContextCurrent(window);
 	} 
+}
+
+//Input Handling
+float rx = 0.0f;
+float ry = 0.0f;
+float tz = 0.0f;
+
+void keyboard()
+{
+	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+		ry += 0.05;
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+		ry -= 0.05;
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP)) {
+		rx -= 0.05;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+		rx += 0.05;
+	}
+	if (glfwGetKey(window, GLFW_KEY_W)) {
+		tz += 0.001;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S)) {
+		tz -= 0.001;
+	}
 }
 
 int main() {
@@ -256,29 +284,29 @@ int main() {
 
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
-	shader->LoadShaderPartFromFile("shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
-	shader->LoadShaderPartFromFile("shaders/frag_shader.glsl", GL_FRAGMENT_SHADER);
+	shader->LoadShaderPartFromFile("shaders/toon_vert.glsl", GL_VERTEX_SHADER);
+	shader->LoadShaderPartFromFile("shaders/toon_frag.glsl", GL_FRAGMENT_SHADER);
 	shader->Link();
-	
-	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
+
+	/*glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
 	glm::vec3 lightCol = glm::vec3(1.f, 1.f, 1.f);
 	float     lightAmbientPow = 0.05f;
 	float     lightSpecularPow = 1.0f;
 	glm::vec3 ambientCol = glm::vec3(1.0f);
 	float     ambientPow = 0.1f;
-	float     shininess = 4.0f;
+	float     shininess = 4.0f;*/
 	// These are our application / scene level uniforms that don't necessarily update
 	// every frame
-	shader->SetUniform("u_LightPos", lightPos);
+	/*shader->SetUniform("u_LightPos", lightPos);
 	shader->SetUniform("u_LightCol", lightCol);
 	shader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
 	shader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
 	shader->SetUniform("u_AmbientCol", ambientCol);
 	shader->SetUniform("u_AmbientStrength", ambientPow);
-	shader->SetUniform("u_Shininess", shininess);
+	shader->SetUniform("u_Shininess", shininess);*/
 
 	// We'll add some ImGui controls to control our shader
-	imGuiCallbacks.push_back([&]() {
+	/*imGuiCallbacks.push_back([&]() {
 		if (ImGui::CollapsingHeader("Scene Level Lighting Settings"))
 		{
 			if (ImGui::ColorPicker3("Ambient Color", glm::value_ptr(ambientCol))) {
@@ -309,7 +337,7 @@ int main() {
 				shader->SetUniform("u_Shininess", shininess);
 			}
 		}
-	});
+	});*/
 
 	// GL states
 	glEnable(GL_DEPTH_TEST);
@@ -323,7 +351,7 @@ int main() {
 	camera->SetUp(glm::vec3(0, 0, -1)); // Use a z-up coordinate system
 	camera->LookAt(glm::vec3(0.0f)); // Look at center of the screen
 	camera->SetFovDegrees(90.0f); // Set an initial FOV
-	
+
 	// This is an example of a key press handling helper. Look at InputHelpers.h an .cpp to see
 	// how this is implemented. Note that the ampersand here is capturing the variables within
 	// the scope. If you wanted to do some method on the class, your best bet would be to give it a method and
@@ -338,7 +366,7 @@ int main() {
 		camera->SetIsOrtho(!camera->GetIsOrtho());
 		});
 
-	InitImGui();
+	//InitImGui();
 		
 	// Our high-precision timer
 	double lastFrame = glfwGetTime();
@@ -355,31 +383,23 @@ int main() {
 		tKeyWatcher.Poll(window);
 		spaceKeyWatch.Poll(window);
 
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-			transform = glm::translate(transform, glm::vec3(-1.0f * dt, 0.0f, 0.0f));
-		}
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-			transform = glm::translate(transform, glm::vec3(1.0f * dt, 0.0f, 0.0f));
-		}
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-			transform = glm::translate(transform, glm::vec3(0.0f, 1.0f * dt, 0.0f));
-		}
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-			transform = glm::translate(transform, glm::vec3(0.0f,  -1.0f * dt, 0.0f));
-		}
+		keyboard();
 
-		transform2 = transform * glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.0f, glm::sin(static_cast<float>(thisFrame))));
+		transform = glm::rotate(transform, glm::radians(ry), glm::vec3(0.0f, 1.0f, 0.0f));
+		transform = glm::rotate(transform, glm::radians(rx), glm::vec3(1.0f, 0.0f, 0.0f));
+		transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, tz));
+		rx = ry = tz = 0;
 
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader->Bind();
-		shader->SetUniform("u_CamPos", camera->GetPosition());
+		//shader->SetUniform("u_CamPos", camera->GetPosition());
 		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* transform);
 		shader->SetUniformMatrix("u_Model", transform);
 		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform));
 		 
-		test.Render();
+		test.Render(); 
 
 		// These are the uniforms that update only once per frame
 		//shader->SetUniformMatrix("u_View", camera->GetView());
@@ -395,13 +415,13 @@ int main() {
 		//shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform3));
 		//vao4->Render();
 
-		RenderImGui();
+		//RenderImGui();
 
 		glfwSwapBuffers(window);
 		lastFrame = thisFrame;
 	}
 
-	ShutdownImGui();
+	//ShutdownImGui();
 
 	// Clean up the toolkit logger so we don't leak memory
 	Logger::Uninitialize();

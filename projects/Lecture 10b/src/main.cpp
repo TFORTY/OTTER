@@ -37,13 +37,13 @@ bool initGLFW() {
 		std::cout << "Failed to Initialize GLFW" << std::endl;
 		return false;
 	}
-
+	 
 	//Create a new GLFW window
 	window = glfwCreateWindow(800, 800, "Window", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	return true;
-}
+} 
 
 bool initGLAD() {
 	if (gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) == 0) {

@@ -288,22 +288,22 @@ int main() {
 	shader->LoadShaderPartFromFile("shaders/toon_frag.glsl", GL_FRAGMENT_SHADER);
 	shader->Link();
 
-	/*glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
-	glm::vec3 lightCol = glm::vec3(1.f, 1.f, 1.f);
-	float     lightAmbientPow = 0.05f;
-	float     lightSpecularPow = 1.0f;
-	glm::vec3 ambientCol = glm::vec3(1.0f);
-	float     ambientPow = 0.1f;
-	float     shininess = 4.0f;*/
+	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
+	//glm::vec3 lightCol = glm::vec3(1.f, 1.f, 1.f);
+	//float     lightAmbientPow = 0.05f;
+	//float     lightSpecularPow = 1.0f;
+	//glm::vec3 ambientCol = glm::vec3(1.0f);
+	//float     ambientPow = 0.1f;
+	//float     shininess = 4.0f;
 	// These are our application / scene level uniforms that don't necessarily update
 	// every frame
-	/*shader->SetUniform("u_LightPos", lightPos);
-	shader->SetUniform("u_LightCol", lightCol);
-	shader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
-	shader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
-	shader->SetUniform("u_AmbientCol", ambientCol);
-	shader->SetUniform("u_AmbientStrength", ambientPow);
-	shader->SetUniform("u_Shininess", shininess);*/
+	shader->SetUniform("u_LightPos", lightPos);
+	//shader->SetUniform("u_LightCol", lightCol);
+	//shader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
+	//shader->SetUniform("u_SpecularLightStrength", lightSpecularPow);
+	//shader->SetUniform("u_AmbientCol", ambientCol);
+	//shader->SetUniform("u_AmbientStrength", ambientPow);
+	//shader->SetUniform("u_Shininess", shininess);
 
 	// We'll add some ImGui controls to control our shader
 	/*imGuiCallbacks.push_back([&]() {
@@ -394,7 +394,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader->Bind();
-		//shader->SetUniform("u_CamPos", camera->GetPosition());
+		shader->SetUniform("u_CamPos", camera->GetPosition());
 		shader->SetUniformMatrix("u_ModelViewProjection", camera->GetViewProjection()* transform);
 		shader->SetUniformMatrix("u_Model", transform);
 		shader->SetUniformMatrix("u_ModelRotation", glm::mat3(transform));

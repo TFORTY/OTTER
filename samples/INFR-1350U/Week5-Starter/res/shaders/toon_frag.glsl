@@ -5,8 +5,8 @@ layout(location = 1) in vec3 inColor;
 layout(location = 2) in vec2 inUV;
 layout(location = 3) in vec3 inNormal;
 
-uniform vec3 light_pos;
-uniform vec3 eye_pos;
+uniform vec3 u_LightPos;
+uniform vec3 u_CamPos;
 
 out vec4 frag_color;
 
@@ -20,10 +20,10 @@ const float scaleFactor = 1.0 / bands;
 
 void main() {
 	
-	vec3 L = normalize(light_pos - inPos);
-	vec3 V = normalize(eye_pos - inPos);
+	vec3 L = normalize(u_LightPos - inPos);
+	vec3 V = normalize(u_CamPos - inPos);
 
-	float dist = length(light_pos - inPos);
+	float dist = length(u_LightPos - inPos);
 
 	float diffuse = max(0, dot(L, inNormal));
 	vec3 diffuseOut = (diffuse * inColor) / (dist*dist);
